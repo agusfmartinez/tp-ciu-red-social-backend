@@ -1,0 +1,748 @@
+openapi: 3.0.0
+info:
+  title: UnaHur Anti-Social Net API
+  version: 1.0.0
+  description: API REST de Anti-Social Net API del TP - Grupo Pedido Simulator, por Agustín Martinez, Ezequiel Piñeyro, Sebastián Masatti.
+servers:
+  - url: http://localhost:4000
+tags:
+  - name: Users
+  - name: Posts
+  - name: Tags
+  - name: Comments
+paths:
+  /users:
+    post:
+      tags: [Users]
+      summary: Creación de usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nickName]
+              properties:
+                nickName:
+                  type: string
+                  example: ggarcia
+      responses:
+        "201":
+          description: Usuario creado con éxito.
+        "400":
+          description: Estructura inválida {errorEncontrado} (Joi).
+        "409":
+          description: Ya existe un usuario con el nickname {nickName}.
+        "500":
+          description: Ocurrió un error al crear el usuario.
+        "500":
+          description: Ocurrió un error al validar el usuario.
+    get:
+      tags: [Users]
+      summary: Obtener todos los usuarios
+      responses:
+        "200":
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "500":
+          description: Ocurrió un error al obtener los usuarios.
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Obtener un usuario por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detalle de usuario
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: ID de usuario inexistente.
+        "500":
+          description: Ocurrió un error al obtener el usuario.
+    put:
+      tags: [Users]
+      summary: Modifica un usuario por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nickName]
+              properties:
+                nickName:
+                  type: string
+                  example: ggarcia
+      responses:
+        "200":
+          description: El usuario con ID {id} fue editado con éxito.
+        "400":
+          description: Estructura inválida {errorEncontrado} (Joi).
+        "404":
+          description: ID de usuario inexistente.
+        "409":
+          description: Ya existe un usuario con el nickname {nickName}.
+        "500":
+          description: Ocurrió un error al editar el usuario.
+        "500":
+          description: Ocurrió un error al validar el usuario.
+    delete:
+      tags: [Users]
+      summary: Elimina un usuario por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      responses:
+        "200":
+          description: El usuario con ID {id} fue eliminado con éxito.
+        "404":
+          description: ID de usuario inexistente.
+        "500":
+          description: Ocurrió un error al eliminar el usuario.
+        "500":
+          description: Ocurrió un error al validar el usuario.
+  /posts:
+    post:
+      tags: [Posts]
+      summary: Creación de post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, descripcion]
+              properties:
+                userId:
+                  type: string
+                  example: "6af79e1951c57a2bc1454427"
+                descripcion:
+                  type: string
+                  example: "Texto descripcion."
+                tags:
+                  type: array
+                  example: ["tag1","tag2"]
+                images:
+                  type: array
+                  example: ["https://.dev/api/18.x.x#string"]
+      responses:
+        "201":
+          description: Publicación creada con éxito.
+        "400":
+          description: Estructura inválida {errorEncontrado} (Joi).
+        "409":
+          description: ID de usuario inexistente.
+        "500":
+          description: Ocurrió un error al obtener el usuario.
+        "500":
+          description: Ocurrió un error al intentar validar el post.
+        "500":
+          description: Ocurrió un error al crear la publicación.
+    get:
+      tags: [Posts]
+      summary: Obtener todos los posts
+      responses:
+        "200":
+          description: Lista de posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+        "500":
+          description: Ocurrió un error al obtener las publicaciones.
+  /posts/{id}:
+    get:
+      tags: [Posts]
+      summary: Obtener un post por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detalle de Post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: ID de publicacion inexistente.
+        "500":
+          description: Ocurrió un error al obtener las publicaciones.
+    patch:
+      tags: [Posts]
+      summary: Modifica un post por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId:
+                  type: string
+                  example: "6af79e1951c57a2bc1454427"
+                descripcion:
+                  type: string
+                  example: "Texto descripcion."
+                tags:
+                  type: array
+                  example: ["tag1","tag2"]
+      responses:
+        "200":
+          description: El Post con ID ${postActualizado.id} fue actualizado con éxito.
+        "400":
+          description: Estructura inválida. El campo userId es obligatorio.
+        "403":
+          description: El usuario no es el dueño de la publicación.
+        "404":
+          description: ID de publicación inexistente.
+        "500":
+          description: Ocurrió un error al actualizar la publicación.
+        "500":
+          description: Ocurrió un error al validar el dueño de la publicación.
+        "500":
+          description: Ocurrió un error al validar la publicación.
+    delete:
+      tags: [Posts]
+      summary: Elimina un post por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId:
+                  type: string
+                  example: "6af79e1951c57a2bc1454427"
+      responses:
+        "200":
+          description: El Post con ID ${post.id} fue eliminado con éxito.
+        "400":
+          description: Estructura inválida. El campo userId es obligatorio.
+        "403":
+          description: El usuario no es el dueño de la publicación.
+        "404":
+          description: ID de publicacion inexistente.
+        "500":
+          description: Ocurrió un error al validar el dueño de la publicación.
+        "500":
+          description: Ocurrió un error al obtener la publicación.
+        "500":
+          description: Ocurrió un error al validar la publicación.
+        "500":
+          description: Ocurrió un error al eliminar la publicación.
+  /posts/{id}/images:
+    post:
+      tags: [Posts]
+      summary: Agregar imagenes a un Post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, images]
+              properties:
+                userId:
+                  type: string
+                  example: "6af79e1951c57a2bc1454427"
+                images:
+                  type: array
+                  example: ["https://.dev/api/18.x.x#string"]
+      responses:
+        "201":
+          description: "Imágenes agregadas al post con éxito."
+        "400":
+          description: Estructura inválida {errorEncontrado} (Joi)
+        "400":
+          description: Estructura inválida. El campo userId es obligatorio.
+        "403":
+          description: El usuario no es el dueño de la publicación.
+        "404":
+          description: ID de publicacion inexistente.
+        "500":
+          description: "Ocurrió un error al agregar las imágenes."
+        "500":
+          description: Ocurrió un error al validar el dueño de la publicación.
+        "500":
+          description: Ocurrió un error al crear la publicación.
+        "500":
+          description: Ocurrió un error al validar las imágenes.
+        "500":
+          description: Ocurrió un error al obtener la publicación.
+  /posts/{id}/images/upload:  
+    post:
+      tags: [Posts]
+      summary: Subir archivos de imagen a un post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [userId, images]
+              properties:
+                userId:
+                  type: string
+                  example: "6af79e1951c57a2bc1454427"
+                images: 
+                  type: string
+                  format: binary
+                  description: Archivo de imagen para subir al post
+      responses:
+        "201":
+          description: Imágenes subidas al post con éxito.
+        "400":
+          description: Estructura inválida. El campo userId es obligatorio.
+        "403":
+          description: El usuario no es el dueño de la publicación.
+        "404":
+          description: ID de publicacion inexistente.
+        "500":
+          description: Ocurrió un error al subir las imágenes.
+        "500":
+          description: Ocurrió un error al validar el dueño de la publicación.
+        "500":
+          description: Ocurrió un error al obtener la publicación.
+  /posts/{id}/images/{imageId}:  
+    delete:
+      tags: [Posts]
+      summary: Eliminar imagenes de un post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+        - name: imageId
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId:
+                  type: string
+                  example: "6af79e1951c57a2bc1454427"
+      responses:
+        "200":
+          description: La imagen con ID {imagen.id} fue eliminada con éxito
+        "400":
+          description: Estructura inválida. El campo userId es obligatorio.
+        "403":
+          description: El usuario no es el dueño de la publicación.
+        "404":
+          description: ID de publicacion inexistente.
+        "404":
+          description: La imagen con ID {imageId} no existe en esta publicación.
+        "500":
+          description: Ocurrió un error al eliminar la imagen.
+        "500":
+          description: Ocurrió un error al validar la imágen.
+        "500":
+          description: Ocurrió un error al obtener la publicación.
+        "500":
+          description: Ocurrió un error al validar el dueño de la publicación.
+  /comments:
+    post:
+      tags: [Comments]
+      summary: Creación de Comentario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comentario, postId, userId]
+              properties:
+                comentario:
+                  type: string
+                  example: "Buen post."
+                postId:
+                  type: string
+                  example: "507f1f77bcf86cd799439011"
+                userId:
+                  type: string
+                  example: "6af79e1951c57a2bc1454427"
+      responses:
+        "201":
+          description: Comentario creado con éxito.
+        "400":
+          description: Estructura inválida {errorEncontrado} (Joi).
+        "404":
+          description: ID de publicacion inexistente / ID de usuario inexistente.
+        "500":
+          description: Ocurrió un error al crear el comentario.
+    get:
+      tags: [Comments]
+      summary: Obtener todos los comentarios
+      responses:
+        "200":
+          description: Lista de comentarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+        "500":
+          description: Ocurrió un error al obtener los comentarios.
+  /comments/{id}:
+    get:
+      tags: [Comments]
+      summary: Obtener un comentario por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detalle del comentario
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "404":
+          description: ID de comentario inexistente.
+        "500":
+          description: Ocurrió un error al obtener el comentario.
+    put:
+      tags: [Comments]
+      summary: Modifica un comentario por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comentario, userId]
+              properties:
+                comentario:
+                  type: string
+                  example: "Comentario editado."
+                userId:
+                  type: string
+                  example: "6af79e1951c57a2bc1454427"
+      responses:
+        "200":
+          description: Comentario actualizado con éxito.
+        "400":
+          description: Estructura inválida {errorEncontrado} (Joi).
+        "403":
+          description: El usuario no es el autor del comentario.
+        "404":
+          description: ID de comentario inexistente.
+        "500":
+          description: Ocurrió un error al actualizar el comentario.
+    delete:
+      tags: [Comments]
+      summary: Elimina un comentario por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId:
+                  type: string
+                  example: "6af79e1951c57a2bc1454427"
+      responses:
+        "200":
+          description: El comentario con ID {id} fue eliminado con éxito.
+        "400":
+          description: Estructura inválida. El campo userId es obligatorio.
+        "403":
+          description: El usuario no es el autor del comentario.
+        "404":
+          description: ID de comentario inexistente.
+        "500":
+          description: Ocurrió un error al eliminar el comentario.
+  /tags:
+    post:
+      tags: [Tags]
+      summary: Creación de tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre]
+              properties:
+                nombre:
+                  type: array
+                  minItems: 1
+                  maxItems: 10
+                  items:
+                    type: string
+                    minLength: 2
+                    maxLength: 20
+                  example:
+                    - videojuegos
+                    - anime
+      responses:
+        "201":
+          description: Tags creados con éxito.
+        "400":
+          description: Estructura inválida (Joi) o nombres duplicados en la solicitud.
+        "409":
+          description: Ya existe un tag con ese nombre.
+        "500":
+          description: Ocurrió un error al crear los tags.
+
+    get:
+      tags: [Tags]
+      summary: Obtener todos los tags
+      responses:
+        "200":
+          description: Lista de tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tag"
+        "500":
+          description: Ocurrió un error al obtener los tags.
+
+  /tags/{id}:
+    get:
+      tags: [Tags]
+      summary: Obtener un tag por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único del tag
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detalle del tag
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tag"
+        "404":
+          description: ID de tag inexistente.
+        "500":
+          description: Ocurrió un error al obtener el tag.
+
+    put:
+      tags: [Tags]
+      summary: Modificar un tag por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único del tag
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre]
+              properties:
+                nombre:
+                  type: string
+                  minLength: 2
+                  maxLength: 20
+                  example: tecnologia
+      responses:
+        "200":
+          description: Tag editado con éxito.
+        "400":
+          description: Estructura inválida (Joi).
+        "404":
+          description: ID de tag inexistente.
+        "409":
+          description: Ya existe un tag con ese nombre.
+        "500":
+          description: Ocurrió un error al editar el tag.
+
+    delete:
+      tags: [Tags]
+      summary: Eliminar un tag por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único del tag
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Tag eliminado con éxito.
+        "400":
+          description: Ocurrió un error al eliminar el tag.
+        "404":
+          description: ID de tag inexistente.
+        "500":
+          description: Ocurrió un error al eliminar el tag.
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "6af79e1951c57a2bc1454427"
+        nickName:
+          type: string
+          example: ggarcia
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        fecha:
+          type: string
+          format: Date
+          example: "2026-10-22T14:23:02.586Z"
+        descripcion:
+          type: string
+          example: "Texto descripcion."
+        user:
+          $ref: "#/components/schemas/User"
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tag"
+        images:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: "507f1f77bcf86cd799439011"
+              url:
+                type: string
+                example: "https://.dev/api/18.x.x#string"
+        comments:
+          type: array
+          description: Solo se ve desde GET /posts/{id} comentarios filtrados por X meses
+          items:
+            $ref: "#/components/schemas/Comment"
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        comentario:
+          type: string
+          example: Buen post lince
+        fecha:
+          type: string
+          format: date-time
+          example: "2026-10-23T00:58:47.611Z"
+        PostId:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        user:
+          $ref: "#/components/schemas/User"
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        nombre:
+          type: string
+          example: videojuegos
